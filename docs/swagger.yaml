@@ -1,0 +1,362 @@
+definitions:
+  model.AdvisorData:
+    properties:
+      active:
+        type: boolean
+      attachment:
+        items:
+          $ref: '#/definitions/model.Thumnail'
+        type: array
+      categories:
+        items:
+          $ref: '#/definitions/model.Categories'
+        type: array
+      content:
+        type: string
+      createdAt:
+        type: string
+      dob:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      job_title:
+        type: string
+      locale:
+        type: string
+      publishedAt:
+        type: string
+      quip:
+        type: string
+      short_content:
+        type: string
+      slug:
+        type: string
+      telephone:
+        type: string
+      thumnail:
+        $ref: '#/definitions/model.Thumnail'
+        type: object
+      updatedAt:
+        type: string
+    type: object
+  model.AdvisorsData:
+    properties:
+      active:
+        type: boolean
+      content:
+        type: string
+      createdAt:
+        type: string
+      dob:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      job_title:
+        type: string
+      locale:
+        type: string
+      publishedAt:
+        type: string
+      quip:
+        type: string
+      short_content:
+        type: string
+      slug:
+        type: string
+      telephone:
+        type: string
+      thumnail:
+        $ref: '#/definitions/model.Thumnail'
+        type: object
+      updatedAt:
+        type: string
+    type: object
+  model.Categories:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      locale:
+        type: string
+      name:
+        type: string
+      publishedAt:
+        type: string
+      slug:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  model.PaginationContent:
+    properties:
+      page:
+        type: integer
+      pageCount:
+        type: integer
+      pageSize:
+        type: integer
+      total:
+        type: integer
+    type: object
+  model.ResponseAdvisor:
+    properties:
+      error:
+        type: error
+      result:
+        $ref: '#/definitions/model.AdvisorData'
+        type: object
+    type: object
+  model.ResponseAdvisorsAll:
+    properties:
+      error:
+        type: error
+      pagination:
+        $ref: '#/definitions/model.PaginationContent'
+        type: object
+      result:
+        items:
+          $ref: '#/definitions/model.AdvisorsData'
+        type: array
+    type: object
+  model.Thumnail:
+    properties:
+      alternativeText:
+        type: string
+      caption:
+        type: string
+      createdAt:
+        type: string
+      ext:
+        type: string
+      formats:
+        $ref: '#/definitions/model.ThumnailDataAttributesFormat'
+        type: object
+      hash:
+        type: string
+      height:
+        type: integer
+      id:
+        type: integer
+      mime:
+        type: string
+      name:
+        type: string
+      previewUrl:
+        type: string
+      provider:
+        type: string
+      provider_metadata:
+        type: string
+      size:
+        type: number
+      updatedAt:
+        type: string
+      url:
+        type: string
+      width:
+        type: integer
+    type: object
+  model.ThumnailDataAttributesFormat:
+    properties:
+      large:
+        $ref: '#/definitions/model.ThumnailDataAttributesFormatLarge'
+        type: object
+      medium:
+        $ref: '#/definitions/model.ThumnailDataAttributesFormatMedium'
+        type: object
+      small:
+        $ref: '#/definitions/model.ThumnailDataAttributesFormatSmall'
+        type: object
+      thumbnail:
+        $ref: '#/definitions/model.ThumnailDataAttributesFormatThumbnail'
+        type: object
+      xsmall:
+        $ref: '#/definitions/model.ThumnailDataAttributesFormatXsmall'
+        type: object
+    type: object
+  model.ThumnailDataAttributesFormatLarge:
+    properties:
+      ext:
+        type: string
+      hash:
+        type: string
+      height:
+        type: integer
+      mime:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: number
+      url:
+        type: string
+      width:
+        type: integer
+    type: object
+  model.ThumnailDataAttributesFormatMedium:
+    properties:
+      ext:
+        type: string
+      hash:
+        type: string
+      height:
+        type: integer
+      mime:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: number
+      url:
+        type: string
+      width:
+        type: integer
+    type: object
+  model.ThumnailDataAttributesFormatSmall:
+    properties:
+      ext:
+        type: string
+      hash:
+        type: string
+      height:
+        type: integer
+      mime:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: number
+      url:
+        type: string
+      width:
+        type: integer
+    type: object
+  model.ThumnailDataAttributesFormatThumbnail:
+    properties:
+      ext:
+        type: string
+      hash:
+        type: string
+      height:
+        type: integer
+      mime:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: number
+      url:
+        type: string
+      width:
+        type: integer
+    type: object
+  model.ThumnailDataAttributesFormatXsmall:
+    properties:
+      ext:
+        type: string
+      hash:
+        type: string
+      height:
+        type: integer
+      mime:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: number
+      url:
+        type: string
+      width:
+        type: integer
+    type: object
+info:
+  contact: {}
+  license: {}
+paths:
+  /advisor-listener/api/advisors:
+    get:
+      consumes:
+      - application/json
+      description: Advisor Listener for the service
+      operationId: AdvisorListenerHandler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ResponseAdvisorsAll'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ResponseAdvisorsAll'
+      summary: Advisor Listener
+      tags:
+      - advisor
+  /advisor-listener/api/advisors/:id:
+    get:
+      consumes:
+      - application/json
+      description: Advisor Listener for the service
+      operationId: AdvisorListenerIdHandler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ResponseAdvisor'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ResponseAdvisor'
+      summary: Advisor Listener
+      tags:
+      - advisor
+  /advisor-listener/api/advisors/slug/:slug:
+    get:
+      consumes:
+      - application/json
+      description: Advisor Listener for the service
+      operationId: AdvisorListenerSlugHandler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ResponseAdvisor'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ResponseAdvisor'
+      summary: Advisor Listener
+      tags:
+      - advisor
+  /healthcheck:
+    get:
+      description: Health checking for the service
+      operationId: HealthCheckHandler
+      produces:
+      - text/plain
+      summary: Health Check
+swagger: "2.0"

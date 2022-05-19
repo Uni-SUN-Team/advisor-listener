@@ -6,6 +6,8 @@ ENV CONTEXT_PATH=/advisor-listener
 ENV PATH_STRAPI_ADVISOR=/api/advisors
 ENV HOST_STRAPI_SERVICE=http://strapi-information-gateway:8080
 ENV PATH_STRAPI_INFORMATION_GATEWAY=/strapi-information-gateway/api/strapi
+ENV VERSION=1.0.1
+ENV HOST=api.unisun.dynu.com
 ENV GIN_MODE=release
 
 WORKDIR /usr/src/app
