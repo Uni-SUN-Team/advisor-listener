@@ -1,6 +1,6 @@
 package model
 
-type Categories struct {
+type categories struct {
 	Id          int64  `json:"id"`
 	Name        string `json:"name"`
 	CreatedAt   string `json:"createdAt"`

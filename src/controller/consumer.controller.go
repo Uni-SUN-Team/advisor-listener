@@ -4,14 +4,24 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"unisun/api/advisor-listener/src/constants"
 	"unisun/api/advisor-listener/src/model"
 	"unisun/api/advisor-listener/src/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
+
+type ConsumerControllerAdapter struct {
+	Service service.ServicePort
+}
+
+func NewConsumerControllerAdapter(serviceValue service.ServicePort) *ConsumerControllerAdapter {
+	return &ConsumerControllerAdapter{
+		Service: serviceValue,
+	}
+}
 
 // Advisor godoc
 // @summary      Advisor Listener
@@ -20,34 +30,40 @@ import (
 // @tags         advisor
 // @accept       json
 // @produce      json
-// @success      200    {object}    model.ResponseAdvisorsAll    "OK"
-// @failure      400    {object}    model.ResponseAdvisorsAll    "Bad Request"
-// @response     500    {object}    model.ResponseAdvisorsAll    "Internal Server Error"
+// @success      200    {object}    model.ResponseAdvisors    "OK"
+// @failure      400    {object}    model.ResponseFail    "Bad Request"
+// @response     500    {object}    model.ResponseFail    "Internal Server Error"
 // @router       /advisor-listener/api/advisors [get]
-func Advisors(c *gin.Context) {
+func (srv *ConsumerControllerAdapter) Advisors(c *gin.Context) {
 	var payloadRequest = model.ServiceIncomeRequest{}
-	var response = model.ResponseAdvisorsAll{}
-	payloadRequest.Path = os.Getenv(constants.PATH_STRAPI_ADVISOR) + "?populate=thumnail"
+	var response = model.ResponseAdvisors{}
+	var responseError = model.ResponseFail{}
+	payloadRequest.Path = strings.Join([]string{viper.GetString("endpoint.advisor.path"), viper.GetString("endpoint.advisor.query.value")}, "")
 	payloadRequest.Method = constants.GET
 	payloadRequest.Body = nil
 	if query := c.Request.URL.RawQuery; query != "" {
 		payloadRequest.Path += "&" + strings.Trim(query, "?")
 	}
-	var advisors model.Advisors
-	data := service.GetInformationFormStrapi(payloadRequest)
-	err := json.Unmarshal([]byte(data.Payload), &advisors)
+	data, err := srv.Service.GetInformationFormStrapi(payloadRequest)
 	if err != nil {
-		log.Println("Change byte to json article", err.Error())
-		response.Error = err
-		c.JSON(http.StatusBadRequest, response)
+		responseError.Error.Status = http.StatusBadRequest
+		responseError.Error.Message = err.Error()
+		responseError.Error.Name = ""
+		responseError.Error.Details = err
+		c.AbortWithStatusJSON(http.StatusBadRequest, responseError)
+		log.Panic(err)
 		return
-	} else {
-		err = nil
 	}
-	response.Error = err
-	response.Result = advisors.Data
-	response.Pagination = advisors.Meta.Pagination
-	c.JSON(http.StatusOK, response)
+	if err = json.Unmarshal([]byte(data), &response); err != nil {
+		responseError.Error.Status = http.StatusBadRequest
+		responseError.Error.Message = err.Error()
+		responseError.Error.Name = "Change byte to json article"
+		responseError.Error.Details = err
+		c.AbortWithStatusJSON(http.StatusBadRequest, responseError)
+		log.Panic(err)
+		return
+	}
+	c.AbortWithStatusJSON(http.StatusOK, response)
 }
 
 // Advisor godoc
@@ -58,30 +74,38 @@ func Advisors(c *gin.Context) {
 // @accept       json
 // @produce      json
 // @success      200    {object}    model.ResponseAdvisor    "OK"
-// @failure      400    {object}    model.ResponseAdvisor    "Bad Request"
-// @response     500    {object}    model.ResponseAdvisor    "Internal Server Error"
+// @failure      400    {object}    model.ResponseFail   "Bad Request"
+// @response     500    {object}    model.ResponseFail   "Internal Server Error"
 // @router       /advisor-listener/api/advisors/:id [get]
-func AdvisorById(c *gin.Context) {
+func (srv *ConsumerControllerAdapter) AdvisorById(c *gin.Context) {
 	id := c.Param("id")
-	var advisor model.Advisor
 	var payloadRequest = model.ServiceIncomeRequest{}
 	var response = model.ResponseAdvisor{}
-	payloadRequest.Path = os.Getenv(constants.PATH_STRAPI_ADVISOR) + "/" + id + "?populate[attachment]=*&populate[categories]=*&populate[thumnail]=*"
+	var responseError = model.ResponseFail{}
+	payloadRequest.Path = strings.Join([]string{viper.GetString("endpoint.advisor.path"), "/", id, viper.GetString("endpoint.advisor.query.value")}, "")
 	payloadRequest.Method = constants.GET
 	payloadRequest.Body = nil
 
-	data := service.GetInformationFormStrapi(payloadRequest)
-	err := json.Unmarshal([]byte(data.Payload), &advisor)
+	data, err := srv.Service.GetInformationFormStrapi(payloadRequest)
 	if err != nil {
-		log.Println("Change byte to json article", err.Error())
-		response.Error = err
-		c.JSON(http.StatusBadRequest, response)
+		responseError.Error.Status = http.StatusBadRequest
+		responseError.Error.Message = err.Error()
+		responseError.Error.Name = ""
+		responseError.Error.Details = err
+		c.AbortWithStatusJSON(http.StatusBadRequest, responseError)
+		log.Panic(err)
 		return
-	} else {
-		err = nil
 	}
-	response.Error = err
-	response.Result = advisor.Data
+	err = json.Unmarshal([]byte(data), &response)
+	if err != nil {
+		responseError.Error.Status = http.StatusBadRequest
+		responseError.Error.Message = err.Error()
+		responseError.Error.Name = "Change byte to json article"
+		responseError.Error.Details = err
+		c.AbortWithStatusJSON(http.StatusBadRequest, responseError)
+		log.Panic("Change byte to json article", err.Error())
+		return
+	}
 	c.JSON(http.StatusOK, response)
 }
 
@@ -92,31 +116,38 @@ func AdvisorById(c *gin.Context) {
 // @tags         advisor
 // @accept       json
 // @produce      json
-// @success      200    {object}    model.ResponseAdvisor    "OK"
-// @failure      400    {object}    model.ResponseAdvisor    "Bad Request"
-// @response     500    {object}    model.ResponseAdvisor    "Internal Server Error"
+// @success      200    {object}    model.ResponseAdvisors    "OK"
+// @failure      400    {object}    model.ResponseFail    "Bad Request"
+// @response     500    {object}    model.ResponseFail    "Internal Server Error"
 // @router       /advisor-listener/api/advisors/slug/:slug [get]
-func AdvisorBySlug(c *gin.Context) {
+func (srv *ConsumerControllerAdapter) AdvisorBySlug(c *gin.Context) {
 	slug := c.Param("slug")
-	var advisors model.AdvisorsSlug
 	var payloadRequest = model.ServiceIncomeRequest{}
-	var response = model.ResponseAdvisor{}
-	payloadRequest.Path = os.Getenv(constants.PATH_STRAPI_ADVISOR) + "?populate[attachment]=*&populate[categories]=*&populate[thumnail]=*&filters[slug][$eq]=" + slug
+	var response = model.ResponseAdvisors{}
+	var responseError = model.ResponseFail{}
+	payloadRequest.Path = strings.Join([]string{viper.GetString("endpoint.advisor.path"), viper.GetString("endpoint.advisor.query.value"), "&filters[slug][$eq]=", slug}, "")
 	payloadRequest.Method = constants.GET
 	payloadRequest.Body = nil
 
-	data := service.GetInformationFormStrapi(payloadRequest)
-	err := json.Unmarshal([]byte(data.Payload), &advisors)
+	data, err := srv.Service.GetInformationFormStrapi(payloadRequest)
 	if err != nil {
-		log.Println("Change byte to json article", err.Error())
-		response.Error = err
-		c.JSON(http.StatusBadRequest, response)
+		responseError.Error.Status = http.StatusBadRequest
+		responseError.Error.Message = err.Error()
+		responseError.Error.Name = ""
+		responseError.Error.Details = err
+		c.AbortWithStatusJSON(http.StatusBadRequest, responseError)
+		log.Panic(err)
 		return
-	} else {
-		err = nil
 	}
-	advisor := advisors.Data[0]
-	response.Error = err
-	response.Result = advisor
+	err = json.Unmarshal([]byte(data), &response)
+	if err != nil {
+		responseError.Error.Status = http.StatusBadRequest
+		responseError.Error.Message = err.Error()
+		responseError.Error.Name = "Change byte to json article"
+		responseError.Error.Details = err
+		c.AbortWithStatusJSON(http.StatusBadRequest, responseError)
+		log.Panic("Change byte to json article", err.Error())
+		return
+	}
 	c.JSON(http.StatusOK, response)
 }

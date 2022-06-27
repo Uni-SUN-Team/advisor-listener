@@ -1,8 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {},
-        "license": {}
+        "contact": {}
     },
     "paths": {
         "/advisor-listener/api/advisors": {
@@ -23,13 +22,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.ResponseAdvisorsAll"
+                            "$ref": "#/definitions/model.ResponseAdvisors"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.ResponseAdvisorsAll"
+                            "$ref": "#/definitions/model.ResponseFail"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseFail"
                         }
                     }
                 }
@@ -59,7 +64,13 @@
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.ResponseAdvisor"
+                            "$ref": "#/definitions/model.ResponseFail"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseFail"
                         }
                     }
                 }
@@ -83,13 +94,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.ResponseAdvisor"
+                            "$ref": "#/definitions/model.ResponseAdvisors"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.ResponseAdvisor"
+                            "$ref": "#/definitions/model.ResponseFail"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResponseFail"
                         }
                     }
                 }
@@ -102,27 +119,72 @@
                     "text/plain"
                 ],
                 "summary": "Health Check",
-                "operationId": "HealthCheckHandler"
+                "operationId": "HealthCheckHandler",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         }
     },
     "definitions": {
-        "model.AdvisorData": {
+        "model.ResponseAdvisor": {
             "type": "object",
             "properties": {
+                "data": {
+                    "$ref": "#/definitions/model.advisorData"
+                },
+                "meta": {
+                    "$ref": "#/definitions/model.pagination"
+                }
+            }
+        },
+        "model.ResponseAdvisors": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.advisorData"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/model.pagination"
+                }
+            }
+        },
+        "model.ResponseFail": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error": {
+                    "$ref": "#/definitions/model.error"
+                }
+            }
+        },
+        "model.advisorData": {
+            "type": "object",
+            "properties": {
+                "SEO": {
+                    "$ref": "#/definitions/model.seo"
+                },
                 "active": {
                     "type": "boolean"
                 },
                 "attachment": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Thumnail"
+                        "$ref": "#/definitions/model.thumbnailLarge"
                     }
                 },
                 "categories": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Categories"
+                        "$ref": "#/definitions/model.categories"
                     }
                 },
                 "content": {
@@ -164,70 +226,15 @@
                 "telephone": {
                     "type": "string"
                 },
-                "thumnail": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.Thumnail"
+                "thumbnail": {
+                    "$ref": "#/definitions/model.thumbnailLarge"
                 },
                 "updatedAt": {
                     "type": "string"
                 }
             }
         },
-        "model.AdvisorsData": {
-            "type": "object",
-            "properties": {
-                "active": {
-                    "type": "boolean"
-                },
-                "content": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "dob": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "full_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "job_title": {
-                    "type": "string"
-                },
-                "locale": {
-                    "type": "string"
-                },
-                "publishedAt": {
-                    "type": "string"
-                },
-                "quip": {
-                    "type": "string"
-                },
-                "short_content": {
-                    "type": "string"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "telephone": {
-                    "type": "string"
-                },
-                "thumnail": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.Thumnail"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.Categories": {
+        "model.categories": {
             "type": "object",
             "properties": {
                 "createdAt": {
@@ -253,7 +260,62 @@
                 }
             }
         },
-        "model.PaginationContent": {
+        "model.error": {
+            "type": "object",
+            "properties": {
+                "details": {},
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.formatAttribute": {
+            "type": "object",
+            "properties": {
+                "ext": {
+                    "type": "string"
+                },
+                "hash": {
+                    "type": "string"
+                },
+                "height": {
+                    "type": "integer"
+                },
+                "mime": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "number"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "width": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.pagination": {
+            "type": "object",
+            "properties": {
+                "pagination": {
+                    "$ref": "#/definitions/model.paginationContent"
+                }
+            }
+        },
+        "model.paginationContent": {
             "type": "object",
             "properties": {
                 "page": {
@@ -270,37 +332,44 @@
                 }
             }
         },
-        "model.ResponseAdvisor": {
+        "model.seo": {
             "type": "object",
             "properties": {
-                "error": {
-                    "type": "error"
+                "id": {
+                    "type": "integer"
                 },
-                "result": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.AdvisorData"
+                "keywords": {
+                    "type": "string"
+                },
+                "metaDescription": {
+                    "type": "string"
+                },
+                "metaTitle": {
+                    "type": "string"
+                },
+                "preventIndexing": {
+                    "type": "boolean"
+                },
+                "shareImage": {
+                    "$ref": "#/definitions/model.seoShareImage"
                 }
             }
         },
-        "model.ResponseAdvisorsAll": {
+        "model.seoShareImage": {
             "type": "object",
             "properties": {
-                "error": {
-                    "type": "error"
+                "alt": {
+                    "type": "string"
                 },
-                "pagination": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.PaginationContent"
+                "id": {
+                    "type": "integer"
                 },
-                "result": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.AdvisorsData"
-                    }
+                "media": {
+                    "$ref": "#/definitions/model.thumbnailLarge"
                 }
             }
         },
-        "model.Thumnail": {
+        "model.thumbnailLarge": {
             "type": "object",
             "properties": {
                 "alternativeText": {
@@ -316,8 +385,7 @@
                     "type": "string"
                 },
                 "formats": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.ThumnailDataAttributesFormat"
+                    "$ref": "#/definitions/model.thumbnailLargeFormat"
                 },
                 "hash": {
                     "type": "string"
@@ -357,188 +425,23 @@
                 }
             }
         },
-        "model.ThumnailDataAttributesFormat": {
+        "model.thumbnailLargeFormat": {
             "type": "object",
             "properties": {
                 "large": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.ThumnailDataAttributesFormatLarge"
+                    "$ref": "#/definitions/model.formatAttribute"
                 },
                 "medium": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.ThumnailDataAttributesFormatMedium"
+                    "$ref": "#/definitions/model.formatAttribute"
                 },
                 "small": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.ThumnailDataAttributesFormatSmall"
+                    "$ref": "#/definitions/model.formatAttribute"
                 },
                 "thumbnail": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.ThumnailDataAttributesFormatThumbnail"
+                    "$ref": "#/definitions/model.formatAttribute"
                 },
                 "xsmall": {
-                    "type": "object",
-                    "$ref": "#/definitions/model.ThumnailDataAttributesFormatXsmall"
-                }
-            }
-        },
-        "model.ThumnailDataAttributesFormatLarge": {
-            "type": "object",
-            "properties": {
-                "ext": {
-                    "type": "string"
-                },
-                "hash": {
-                    "type": "string"
-                },
-                "height": {
-                    "type": "integer"
-                },
-                "mime": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "number"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "width": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.ThumnailDataAttributesFormatMedium": {
-            "type": "object",
-            "properties": {
-                "ext": {
-                    "type": "string"
-                },
-                "hash": {
-                    "type": "string"
-                },
-                "height": {
-                    "type": "integer"
-                },
-                "mime": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "number"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "width": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.ThumnailDataAttributesFormatSmall": {
-            "type": "object",
-            "properties": {
-                "ext": {
-                    "type": "string"
-                },
-                "hash": {
-                    "type": "string"
-                },
-                "height": {
-                    "type": "integer"
-                },
-                "mime": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "number"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "width": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.ThumnailDataAttributesFormatThumbnail": {
-            "type": "object",
-            "properties": {
-                "ext": {
-                    "type": "string"
-                },
-                "hash": {
-                    "type": "string"
-                },
-                "height": {
-                    "type": "integer"
-                },
-                "mime": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "number"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "width": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.ThumnailDataAttributesFormatXsmall": {
-            "type": "object",
-            "properties": {
-                "ext": {
-                    "type": "string"
-                },
-                "hash": {
-                    "type": "string"
-                },
-                "height": {
-                    "type": "integer"
-                },
-                "mime": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "size": {
-                    "type": "number"
-                },
-                "url": {
-                    "type": "string"
-                },
-                "width": {
-                    "type": "integer"
+                    "$ref": "#/definitions/model.formatAttribute"
                 }
             }
         }

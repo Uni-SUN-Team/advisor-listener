@@ -1,15 +1,39 @@
 definitions:
-  model.AdvisorData:
+  model.ResponseAdvisor:
     properties:
+      data:
+        $ref: '#/definitions/model.advisorData'
+      meta:
+        $ref: '#/definitions/model.pagination'
+    type: object
+  model.ResponseAdvisors:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.advisorData'
+        type: array
+      meta:
+        $ref: '#/definitions/model.pagination'
+    type: object
+  model.ResponseFail:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/model.error'
+    type: object
+  model.advisorData:
+    properties:
+      SEO:
+        $ref: '#/definitions/model.seo'
       active:
         type: boolean
       attachment:
         items:
-          $ref: '#/definitions/model.Thumnail'
+          $ref: '#/definitions/model.thumbnailLarge'
         type: array
       categories:
         items:
-          $ref: '#/definitions/model.Categories'
+          $ref: '#/definitions/model.categories'
         type: array
       content:
         type: string
@@ -37,49 +61,12 @@ definitions:
         type: string
       telephone:
         type: string
-      thumnail:
-        $ref: '#/definitions/model.Thumnail'
-        type: object
+      thumbnail:
+        $ref: '#/definitions/model.thumbnailLarge'
       updatedAt:
         type: string
     type: object
-  model.AdvisorsData:
-    properties:
-      active:
-        type: boolean
-      content:
-        type: string
-      createdAt:
-        type: string
-      dob:
-        type: string
-      email:
-        type: string
-      full_name:
-        type: string
-      id:
-        type: integer
-      job_title:
-        type: string
-      locale:
-        type: string
-      publishedAt:
-        type: string
-      quip:
-        type: string
-      short_content:
-        type: string
-      slug:
-        type: string
-      telephone:
-        type: string
-      thumnail:
-        $ref: '#/definitions/model.Thumnail'
-        type: object
-      updatedAt:
-        type: string
-    type: object
-  model.Categories:
+  model.categories:
     properties:
       createdAt:
         type: string
@@ -96,7 +83,43 @@ definitions:
       updatedAt:
         type: string
     type: object
-  model.PaginationContent:
+  model.error:
+    properties:
+      details: {}
+      message:
+        type: string
+      name:
+        type: string
+      status:
+        type: integer
+    type: object
+  model.formatAttribute:
+    properties:
+      ext:
+        type: string
+      hash:
+        type: string
+      height:
+        type: integer
+      mime:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: number
+      url:
+        type: string
+      width:
+        type: integer
+    type: object
+  model.pagination:
+    properties:
+      pagination:
+        $ref: '#/definitions/model.paginationContent'
+    type: object
+  model.paginationContent:
     properties:
       page:
         type: integer
@@ -107,27 +130,31 @@ definitions:
       total:
         type: integer
     type: object
-  model.ResponseAdvisor:
+  model.seo:
     properties:
-      error:
-        type: error
-      result:
-        $ref: '#/definitions/model.AdvisorData'
-        type: object
+      id:
+        type: integer
+      keywords:
+        type: string
+      metaDescription:
+        type: string
+      metaTitle:
+        type: string
+      preventIndexing:
+        type: boolean
+      shareImage:
+        $ref: '#/definitions/model.seoShareImage'
     type: object
-  model.ResponseAdvisorsAll:
+  model.seoShareImage:
     properties:
-      error:
-        type: error
-      pagination:
-        $ref: '#/definitions/model.PaginationContent'
-        type: object
-      result:
-        items:
-          $ref: '#/definitions/model.AdvisorsData'
-        type: array
+      alt:
+        type: string
+      id:
+        type: integer
+      media:
+        $ref: '#/definitions/model.thumbnailLarge'
     type: object
-  model.Thumnail:
+  model.thumbnailLarge:
     properties:
       alternativeText:
         type: string
@@ -138,8 +165,7 @@ definitions:
       ext:
         type: string
       formats:
-        $ref: '#/definitions/model.ThumnailDataAttributesFormat'
-        type: object
+        $ref: '#/definitions/model.thumbnailLargeFormat'
       hash:
         type: string
       height:
@@ -165,132 +191,21 @@ definitions:
       width:
         type: integer
     type: object
-  model.ThumnailDataAttributesFormat:
+  model.thumbnailLargeFormat:
     properties:
       large:
-        $ref: '#/definitions/model.ThumnailDataAttributesFormatLarge'
-        type: object
+        $ref: '#/definitions/model.formatAttribute'
       medium:
-        $ref: '#/definitions/model.ThumnailDataAttributesFormatMedium'
-        type: object
+        $ref: '#/definitions/model.formatAttribute'
       small:
-        $ref: '#/definitions/model.ThumnailDataAttributesFormatSmall'
-        type: object
+        $ref: '#/definitions/model.formatAttribute'
       thumbnail:
-        $ref: '#/definitions/model.ThumnailDataAttributesFormatThumbnail'
-        type: object
+        $ref: '#/definitions/model.formatAttribute'
       xsmall:
-        $ref: '#/definitions/model.ThumnailDataAttributesFormatXsmall'
-        type: object
-    type: object
-  model.ThumnailDataAttributesFormatLarge:
-    properties:
-      ext:
-        type: string
-      hash:
-        type: string
-      height:
-        type: integer
-      mime:
-        type: string
-      name:
-        type: string
-      path:
-        type: string
-      size:
-        type: number
-      url:
-        type: string
-      width:
-        type: integer
-    type: object
-  model.ThumnailDataAttributesFormatMedium:
-    properties:
-      ext:
-        type: string
-      hash:
-        type: string
-      height:
-        type: integer
-      mime:
-        type: string
-      name:
-        type: string
-      path:
-        type: string
-      size:
-        type: number
-      url:
-        type: string
-      width:
-        type: integer
-    type: object
-  model.ThumnailDataAttributesFormatSmall:
-    properties:
-      ext:
-        type: string
-      hash:
-        type: string
-      height:
-        type: integer
-      mime:
-        type: string
-      name:
-        type: string
-      path:
-        type: string
-      size:
-        type: number
-      url:
-        type: string
-      width:
-        type: integer
-    type: object
-  model.ThumnailDataAttributesFormatThumbnail:
-    properties:
-      ext:
-        type: string
-      hash:
-        type: string
-      height:
-        type: integer
-      mime:
-        type: string
-      name:
-        type: string
-      path:
-        type: string
-      size:
-        type: number
-      url:
-        type: string
-      width:
-        type: integer
-    type: object
-  model.ThumnailDataAttributesFormatXsmall:
-    properties:
-      ext:
-        type: string
-      hash:
-        type: string
-      height:
-        type: integer
-      mime:
-        type: string
-      name:
-        type: string
-      path:
-        type: string
-      size:
-        type: number
-      url:
-        type: string
-      width:
-        type: integer
+        $ref: '#/definitions/model.formatAttribute'
     type: object
 info:
   contact: {}
-  license: {}
 paths:
   /advisor-listener/api/advisors:
     get:
@@ -304,11 +219,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.ResponseAdvisorsAll'
+            $ref: '#/definitions/model.ResponseAdvisors'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.ResponseAdvisorsAll'
+            $ref: '#/definitions/model.ResponseFail'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ResponseFail'
       summary: Advisor Listener
       tags:
       - advisor
@@ -328,7 +247,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.ResponseAdvisor'
+            $ref: '#/definitions/model.ResponseFail'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ResponseFail'
       summary: Advisor Listener
       tags:
       - advisor
@@ -344,11 +267,15 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.ResponseAdvisor'
+            $ref: '#/definitions/model.ResponseAdvisors'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.ResponseAdvisor'
+            $ref: '#/definitions/model.ResponseFail'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ResponseFail'
       summary: Advisor Listener
       tags:
       - advisor
@@ -358,5 +285,10 @@ paths:
       operationId: HealthCheckHandler
       produces:
       - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
       summary: Health Check
 swagger: "2.0"

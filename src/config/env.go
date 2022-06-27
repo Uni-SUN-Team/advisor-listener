@@ -1,16 +1,31 @@
 package config
 
 import (
-	"os"
-	"unisun/api/advisor-listener/src/constants"
+	"strings"
+
+	"github.com/spf13/viper"
 )
 
-func ConfigENV() {
-	os.Setenv(constants.PORT, "8080")
-	os.Setenv(constants.CONTEXT_PATH, "/advisor-listener")
-	// Strapi information gateway
-	os.Setenv(constants.HOST_STRAPI_SERVICE, "https://api.unisun.dynu.com")
-	os.Setenv(constants.PATH_STRAPI_INFORMATION_GATEWAY, "/strapi-information-gateway/api/strapi")
-	// Path
-	os.Setenv(constants.PATH_STRAPI_ADVISOR, "/api/advisors")
+type Service struct {
+	Name string
+	Path string
+}
+
+func New(name string, path string) *Service {
+	return &Service{
+		Name: name,
+		Path: path,
+	}
+}
+
+func (srv *Service) ConfigENV() error {
+	viper.SetConfigName(srv.Name)
+	viper.AddConfigPath(srv.Path)
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	err := viper.ReadInConfig()
+	if err != nil {
+		return err
+	}
+	return nil
 }

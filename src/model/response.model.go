@@ -1,12 +1,21 @@
 package model
 
-type ResponseAdvisorsAll struct {
-	Error      error             `json:"error"`
-	Result     []AdvisorsData    `json:"result"`
-	Pagination PaginationContent `json:"pagination"`
+type ResponseAdvisors struct {
+	advisors
 }
 
 type ResponseAdvisor struct {
-	Error  error       `json:"error"`
-	Result AdvisorData `json:"result"`
+	advisor
+}
+
+type ResponseFail struct {
+	Data  interface{} `json:"data"`
+	Error error       `json:"error"`
+}
+
+type error struct {
+	Status  int64       `json:"status"`
+	Name    string      `json:"name"`
+	Message string      `json:"message"`
+	Details interface{} `json:"details"`
 }

@@ -2,12 +2,18 @@ package utils
 
 import (
 	"bytes"
-	"log"
 	"net/http"
 	"time"
 )
 
-func HTTPRequest(url string, method string, payload []byte) *http.Response {
+type HTTPRequestAdapter struct {
+}
+
+func NewHTTPRequestAdapter() *HTTPRequestAdapter {
+	return &HTTPRequestAdapter{}
+}
+
+func (*HTTPRequestAdapter) HTTPRequest(url string, method string, payload []byte) (*http.Response, error) {
 	var request *http.Request
 	var err error
 	var body *bytes.Buffer
@@ -34,16 +40,16 @@ func HTTPRequest(url string, method string, payload []byte) *http.Response {
 		body = bytes.NewBuffer(nil)
 	}
 	if err != nil {
-		log.Println("Create request error.", err.Error())
+		return nil, err
 	}
 	request, err = http.NewRequest(method, url, body)
 	if err != nil {
-		log.Println("Client request to "+url+" is not success.", err.Error())
+		return nil, err
 	}
 	request.Header.Add("Content-type", "application/json")
 	response, err := client.Do(request)
 	if err != nil {
-		log.Println("Client is error.", err.Error())
+		return nil, err
 	}
-	return response
+	return response, nil
 }

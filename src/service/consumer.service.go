@@ -3,45 +3,42 @@ package service
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
-	"os"
 	"unisun/api/advisor-listener/src/constants"
 	"unisun/api/advisor-listener/src/model"
 	"unisun/api/advisor-listener/src/utils"
+
+	"github.com/spf13/viper"
 )
 
-func GetInformationFormStrapi(payloadRequest model.ServiceIncomeRequest) model.ServiceIncomeResponse {
+type ConsumerServiceAdapter struct {
+	Utils utils.UtilsPort
+}
+
+func NewConsumerServiceAdapter(utils utils.UtilsPort) *ConsumerServiceAdapter {
+	return &ConsumerServiceAdapter{
+		Utils: utils,
+	}
+}
+
+func (svr *ConsumerServiceAdapter) GetInformationFormStrapi(payloadRequest model.ServiceIncomeRequest) (string, error) {
 	var serviceIncomeResponse = model.ServiceIncomeResponse{}
-	url := os.Getenv(constants.HOST_STRAPI_SERVICE) + os.Getenv(constants.PATH_STRAPI_INFORMATION_GATEWAY)
+	url := viper.GetString("endpoint.strapi-information-gateway.host") + viper.GetString("endpoint.strapi-information-gateway.path")
 	payload, err := json.Marshal(payloadRequest)
 	if err != nil {
-		log.Println("Change json to byte", err.Error())
-		serviceIncomeResponse.Error = err.Error()
-		return serviceIncomeResponse
-	} else {
-		err = nil
+		return "", err
 	}
-	response := utils.HTTPRequest(url, constants.POST, payload)
+	response, err := svr.Utils.HTTPRequest(url, constants.POST, payload)
+	if err != nil {
+		return "", err
+	}
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Println("Read response from request error.", err.Error())
-		serviceIncomeResponse.Error = err.Error()
-		return serviceIncomeResponse
-	} else {
-		err = nil
-		defer response.Body.Close()
+		return "", err
 	}
+	defer response.Body.Close()
 	err = json.Unmarshal([]byte(body), &serviceIncomeResponse)
 	if err != nil {
-		log.Println("Change byte to json response", err.Error())
-		serviceIncomeResponse.Error = err.Error()
-		return serviceIncomeResponse
-	} else {
-		err = nil
-
+		return "", err
 	}
-	if serviceIncomeResponse.Error != "" {
-		log.Println(serviceIncomeResponse.Error)
-	}
-	return serviceIncomeResponse
+	return serviceIncomeResponse.Payload, nil
 }
